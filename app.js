@@ -1,6 +1,8 @@
 const express = require("express");
 const exphbs = require("express-handlebars");
 const methodOverride = require("method-override");
+const session = require("express-session");
+const usePassport = require("./config/passport");
 const app = express();
 //* 導入自訂環境參數
 if (process.env.NODE_ENV !== "production") {
@@ -8,10 +10,6 @@ if (process.env.NODE_ENV !== "production") {
 }
 //* 載入路由
 const Router = require("./routes");
-//* 載入資料庫
-const db = require("./models");
-const Todo = db.Todo;
-const User = db.User;
 
 const PORT = process.env.PORT;
 //* 設定模板引擎
@@ -22,6 +20,14 @@ app.set("view engine", "hbs");
 app.use(express.urlencoded({ extended: true }));
 //* 修改路由方法，使語意化達成
 app.use(methodOverride("_method"));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+usePassport(app);
 
 //* 分配路由
 app.use(Router);
