@@ -22,14 +22,23 @@ router.get("/register", (req, res) => {
 
 router.post("/register", (req, res) => {
   const { name, email, password, confirmPassword } = req.body;
+  let errors = [];
+  if (!name || !email || !password || !confirmPassword) {
+    errors.push({ message: "每一個欄位都是必填！" });
+  }
+  if (password !== confirmPassword) {
+    errors.push({ message: "密碼和確認密碼不一致！" });
+  }
+  if (errors.length) {
+    return res.render("register", { user: req.body, errors });
+  }
   User.findOne({ where: { email } }).then((user) => {
     if (user) {
-      console.log("User already exists");
+      errors.push({ message: "信箱已經註冊！" });
       return res.render("register", {
         name,
         email,
-        password,
-        confirmPassword,
+        errors,
       });
     }
     return bcrypt
@@ -52,7 +61,7 @@ router.get("/logout", (req, res, next) => {
     if (err) {
       return next(err);
     }
-    // req.flash("success_msg", "你已經成功登出了！");
+    req.flash("success_msg", "你已經成功登出了！");
     res.redirect("/users/login");
   });
 });

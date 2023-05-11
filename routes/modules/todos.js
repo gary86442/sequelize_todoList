@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 //* 載入資料庫
 const db = require("../../models");
-const { ConnectionTimedOutError } = require("sequelize");
 const Todo = db.Todo;
 //* 新增
 router.get("/new", (req, res) => {
@@ -10,7 +9,6 @@ router.get("/new", (req, res) => {
 });
 router.post("/", (req, res) => {
   const name = req.body.name;
-  //todo 等登入做完才能有作用
   const userId = req.user.id;
   Todo.create({ name, userId })
     .then(() => {
